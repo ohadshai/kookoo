@@ -1,5 +1,10 @@
 import os
-from ConfigParser import ConfigParser, NoOptionError
+from sys import version_info
+
+if version_info[0] < 3:
+    from ConfigParser import ConfigParser
+else:
+    from configparser import ConfigParser
 
 ROOT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SETTINGS_PATH = os.path.join(ROOT_DIR, 'settings.ini')
@@ -11,11 +16,6 @@ class SettingsValueError(Exception):
 
 class GetFunctionError(Exception):
     "value_type to get function needs to be: str/int/float/boolean"
-
-
-class SettingsSectionError(Exception):
-    """Section does not exists in settings.ini"""
-
 
 class SettingsHandler(object):
     def __init__(self, settings_path=SETTINGS_PATH):
@@ -34,6 +34,13 @@ class SettingsHandler(object):
             raise FileNotFoundError("Settings.ini Does not exists on the path: {}".format(self.path))
 
     def get_setting(self, section, setting, value_type='str'):
+        """
+        Returns the setting in the given section with the requested value type
+        :param section:
+        :param setting:
+        :param value_type:
+        :return:
+        """
         get_setting_name = "get{v_type}".format(v_type="" if value_type == 'str' else value_type)
         get_setting_func = getattr(self.config, get_setting_name, None)
         if get_setting_func is None:

@@ -6,25 +6,23 @@ import sys
 from flask import Flask, request, Response
 
 ROOT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+CERT_DIR = os.path.join(os.path.join(ROOT_DIR, 'common'), 'cert')
 sys.path.append(ROOT_DIR)
-
 
 from common.SettingsHandler import SettingsHandler
 from server.functions_handler import FunctionsHandler
 from server.server_logger import log
 
-functions_handler = FunctionsHandler()
-
 app = Flask(__name__)
-
-
-ROOT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-CERT_DIR = os.path.join(os.path.join(ROOT_DIR, 'common'), 'cert')
-SETTINGS_PATH = os.path.join(ROOT_DIR, 'settings.ini')
+functions_handler = FunctionsHandler()
 
 
 @app.route('/GetFunction', methods=['GET'])
 def get_function():
+    """
+    Server send a randomize function name
+    :return:
+    """
     try:
         function_name = functions_handler.get_random_function()
         if not function_name:
@@ -41,9 +39,13 @@ def get_function():
 
 
 @app.route('/SendResponse', methods=['POST'])
-def response_function():
+def send_response():
+    """
+    Server handles response after executing function
+    :return:
+    """
     try:
-        function_response = request.get_data()
+        function_response = request.get_data() if sys.version_info[0] < 3 else request.get_data().decode()
         if function_response:
             log.info(function_response)
     except Exception:

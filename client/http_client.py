@@ -3,18 +3,20 @@ __project__ = 'kookoo'
 
 import os
 import sys
+import re
 import time
 import requests
 import urllib3
 
 ROOT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.append(ROOT_DIR)
-urllib3.disable_warnings(urllib3.exceptions.SecurityWarning)
 
 from client.client_logger import log
 from client.functions_exector import FunctionExector
 from common.HTTPResponseCodes import ResponseCode
 from common.SettingsHandler import SettingsHandler
+
+urllib3.disable_warnings(urllib3.exceptions.SecurityWarning)
 
 
 class HTTPClient(object):
@@ -22,19 +24,42 @@ class HTTPClient(object):
     Responsible of sending request for new command and sending the response of command using executors threads
     """
     def __init__(self):
-        self.cert_path = os.path.join(os.path.join(ROOT_DIR, 'common'), 'cert')
         self.settings_handler = SettingsHandler()
+        self.function_executor = FunctionExector()
+
         ip, port = self.settings_handler.get_setting("Server", "ip"), self.settings_handler.get_setting("Server", "port")
         self._uri_get_command = 'https://{}:{}/{}'.format(ip, port, "GetFunction")
         self._uri_response_function = 'https://{}:{}/{}'.format(ip, port, "SendResponse")
         self._get_function_time_interval = self.settings_handler.get_setting("Client", "get_function_interval",
                                                                              value_type='int')
+        self.cert_path = os.path.join(os.path.join(ROOT_DIR, 'common'), 'cert')
 
-        self.function_executor = FunctionExector()
+    def get_params(self, func_call):
+        """
+        Get from function call the function name and function params (if exist)
+        :param func_call:
+        :return:
+        """
+        m = re.match(r"([^(]+)\((.*)\)", func_call)
+        if not m:
+            return func_call, ()
+
+        def handle_parameter(param):
+            param = param.strip()
+            try:
+                int(param)
+            except ValueError:
+                return param
+            return int(param)
+
+        func_name = m.group(1)
+        params = tuple(map(handle_parameter, m.group(2).split(',')))
+
+        return func_name, params
 
     def send_response(self, func_name, content):
         """
-        Send output command to server
+        Send function's output to server
         :return:
         """
         try:
@@ -55,7 +80,7 @@ class HTTPClient(object):
             else:
                 log.error("Unknown Error. response code is: {}".format(response.status_code))
         except Exception as e:
-            print("Error in sending response to server. Reason: {}".format(str(e)))
+            print("Failure in sending response to server. Reason: {}".format(str(e)))
 
     def run(self):
         """
@@ -71,11 +96,12 @@ class HTTPClient(object):
                     if not response.content:
                         log.info("No function from Server")
                     else:
-                        function_name = response.content
-                        log.info("Received new function: '{}'".format(function_name))
-                        res = self.function_executor.execute_function(function_name)
+                        func_call = response.content if sys.version_info[0] < 3 else response.content.decode()
+                        log.info("===== Received new function ===== : '{}'".format(func_call))
+                        function_name, params = self.get_params(func_call)
+                        res = self.function_executor.execute_function(function_name, *params)
                         log.info("Function executed successfully")
-                        self.send_response(response.content, res)
+                        self.send_response(function_name, res)
                 elif response.status_code == ResponseCode.BAD_REQUEST:
                     log.error("client request data is not valid")
                 elif response.status_code == ResponseCode.BAD_METHOD:
@@ -87,6 +113,6 @@ class HTTPClient(object):
             except RuntimeError as e:
                 log.error("Failure in executing command. Reason: {}".format(str(e)))
             except Exception as e:
-                log.error("Failure in sending request to server. Reason: {}".format(str(e)))
+                log.error("Failure. Reason: {}".format(str(e)))
             finally:
                 time.sleep(self._get_function_time_interval)

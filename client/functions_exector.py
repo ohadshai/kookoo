@@ -28,19 +28,68 @@ class FunctionExector(object):
         return func(*args, **kwargs)
 
     def hello_world(self):
+        """
+        Prints 'Hello World'
+        :return:
+        """
         log.info("Hello World")
 
-    def get_fibonacci_10(self):
-        def F(n):
-            if n == 0:
-                return 0
-            elif n == 1:
-                return 1
-            else:
-                return F(n - 1) + F(n - 2)
-        n = 10
-        res = F(n)
-        log.info("Fibonacci result for the number {}: {}".format(n, res))
-        return res
+    def add(self, x, y):
+        """
+        Adds two numbers
+        :param x:
+        :param y:
+        :return:
+        """
+        return x + y
+
+    def subtract(self, x, y):
+        """
+        Subtracts two numbers
+        :param x:
+        :param y:
+        :return:
+        """
+        return x - y
+
+    def multiply(self, x, y):
+        """
+        Multiplies two numbers
+        :param x:
+        :param y:
+        :return:
+        """
+        return x * y
+
+    def divide(self, x, y):
+        """
+        Divides two numbers
+        :param x:
+        :param y:
+        :return:
+        """
+        return x / y
+
+    def pow_2(self, n):
+        """
+        Returns the power of n in 2
+        :param x:
+        :param y:
+        :return:
+        """
+        return n**2
+
+    def fibonacci(self, n):
+        """
+        Calculates fibonachi result according to n
+        :param n:
+        :return:
+        """
+        if n == 0:
+            return 0
+        elif n == 1:
+            return 1
+        else:
+            return self.fibonacci(n - 1) + self.fibonacci(n - 2)
 
 

@@ -1,3 +1,6 @@
+__author__ = 'Ohad Shai'
+__project__ = 'kookoo'
+
 import os
 import sys
 import random

@@ -1,3 +1,6 @@
+__author__ = 'Ohad Shai'
+__project__ = 'kookoo'
+
 import os
 import logging
 import logging.handlers as handlers
@@ -10,6 +13,9 @@ LOG_PATH = os.path.join(ROOT_DIR, 'kookoo.log')
 
 
 class KookooLogger(object):
+    """
+    Responsible with logging to log file and to stdout
+    """
     def __init__(self, name, path=LOG_PATH):
         self.settings_handler = SettingsHandler()
         self.logger = logging.getLogger(name)

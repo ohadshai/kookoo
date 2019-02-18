@@ -1,2 +1,7 @@
 hello_world
-get_fibonacci_10
+fibonacci(10)
+add(1,2)
+divide(15,5)
+pow_2(7)
+subtract(10,6)
+pow_2(7,9)
