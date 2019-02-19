@@ -1,5 +1,5 @@
 ##################  Description  #################
-##################################################
+
 
 In this program There is a server that yanks as first step function calls from a file
 and the client every interval of time, requests for new function from the server.
@@ -15,11 +15,12 @@ the function and will send the response to the server.
 
 ** In this Program I used root logger with 2 handlers: 1 for log file 1 for stdout.
    The log file is being rotated by the application (every week, 4 weeks back).
+
    IMPORTANT: the log file is being written from two processes - Client and Server.
               If there will be more writers for this log or the writing speed to log will be fast enough it could
               trigger locking of the file and messages not will be written in live (from experience)
 
-   Example Solution to this corner case - in Linux (but I am sure it's possible in other OSs):
+   My logging for now is good, but Example Solution to this corner case - in Linux (but I am sure it's possible in other OSs):
 
     * Use syslog process to collect logs from a lot of applications in parallel and dispatch them to relevant
       log file + using the right class (SyslogHandler) in Python apps.
