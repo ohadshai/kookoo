@@ -12,6 +12,7 @@ the function and will send the response to the server.
 * In order to add new function calls :
   1. Add the function call in server\functions.txt
   2. Add the function implementation in client\functions_executor.py
+  * When you add function with no args - put the name without brackets
 
 ** In this Program I used root logger with 2 handlers: 1 for log file 1 for stdout.
    The log file is being rotated by the application (every week, 4 weeks back).
