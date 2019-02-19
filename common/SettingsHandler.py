@@ -1,3 +1,6 @@
+__author__ = 'Ohad Shai'
+__project__ = 'kookoo'
+
 import os
 from sys import version_info
 

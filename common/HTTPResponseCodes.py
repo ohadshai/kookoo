@@ -1,3 +1,7 @@
+__author__ = 'Ohad Shai'
+__project__ = 'kookoo'
+
+
 from enum import Enum
 
 
