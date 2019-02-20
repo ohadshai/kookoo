@@ -53,7 +53,6 @@ the function and will send the response to the server.
             missingok
             notifempty
             maxsize 10M
-            sharedscripts
             postrotate
                 invoke-rc.d rsyslog rotate > /dev/null
             endscript
